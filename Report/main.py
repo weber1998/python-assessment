@@ -1,5 +1,6 @@
 from JsonModel import JsonModel
 from ToPptx import ToPptx
+from create_dat import Create_dat
 import json
 
 def read_json_file():
@@ -8,6 +9,9 @@ def read_json_file():
         data = json.load(f)
     return data
 def main():
+
+    create_dat = Create_dat()
+    create_dat.write()
 
     json_model = JsonModel()
     data = read_json_file()

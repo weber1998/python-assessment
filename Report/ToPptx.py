@@ -1,5 +1,9 @@
 from pptx import Presentation
 from PIL import Image
+from pptx.util import Inches
+from pptx.chart.data import CategoryChartData
+from pptx.enum.chart import XL_CHART_TYPE
+import pandas as pd
 class ToPptx:
     def __init__(self, json_data):
         self.json_data = json_data
@@ -58,11 +62,22 @@ class ToPptx:
                 slide.shapes.add_picture(slide_content, left, top)
 
             elif slide_type == 'plot':
+
                 content_placeholder = slide.placeholders[0]
                 content_placeholder.text = slide_title
                 configuration = slide_data.get('configuration', {})
                 x_label = configuration.get('x-label', '')
                 y_label = configuration.get('y-label', '')
+
+                data = pd.read_csv(slide_content, delimiter="\t")
+                chart_data = CategoryChartData()
+                chart_data.categories = data[data.columns[0]].tolist()
+                chart_data.add_series("Series 1", data[data.columns[1]].tolist())
+
+                x, y, cx, cy = Inches(2), Inches(2), Inches(6), Inches(4.5)
+                chart = slide.shapes.add_chart(
+                    XL_CHART_TYPE.LINE, x, y, cx, cy, chart_data
+                ).chart
 
     def _get_slide_layout(self, slide_type):
         slide_layouts = self.presentation.slide_layouts
